@@ -1,89 +1,95 @@
 # Trainer Peak
 
-PWA de entrenamiento sin backend, cuentas ni sincronización. Rutinas y sesiones se guardan en IndexedDB del dispositivo. El catálogo de 876 ejercicios está incluido y funciona offline después de la primera carga.
+Aplicación web progresiva para planificar rutinas de fuerza e hipertrofia, registrar entrenamientos y seguir la sobrecarga progresiva. Funciona sin conexión después de la primera carga y guarda los datos en el dispositivo, sin cuentas ni backend.
 
-Repositorio: https://github.com/JosephDonoso/trainer-peak
+**[Abrir Trainer Peak](https://josephdonoso.github.io/trainer-peak/)**
 
-URL prevista de GitHub Pages: https://josephdonoso.github.io/trainer-peak/ (requiere activar Pages y completar el despliegue).
+## Funcionalidades
 
-## Lo que tienes que hacer en tu cuenta
+- **Planificación de rutinas:** generación según equipamiento, días disponibles y preferencias, con divisiones full body, superior/inferior y push/pull/legs. Incluye semanas A/B, hasta dos músculos prioritarios y edición manual.
+- **Biblioteca de ejercicios:** 876 ejercicios disponibles sin conexión, con favoritos, exclusiones y ejercicios personalizados. El generador utiliza una selección prioritaria de 30 movimientos y los ejercicios adicionales habilitados por el usuario.
+- **Registro de sesiones:** series con carga, repeticiones y esfuerzo RPE/RIR; valores precargados editables, confirmación individual, registro retrospectivo y recuperación de sesiones en curso.
+- **Descansos:** temporizador al confirmar cada serie, con duración ajustable según el ejercicio.
+- **Progresión:** objetivos de repeticiones y carga, con un ciclo opcional de cuatro semanas y semana de descarga.
+- **Seguimiento:** historial editable, récords por ejercicio, 1RM estimado y probado diferenciados, y volumen por grupo muscular.
+- **Datos portables:** exportación e importación de respaldos JSON.
+- **Instalación como PWA:** acceso desde la pantalla de inicio y uso sin conexión, sin dependencias remotas durante el entrenamiento.
 
-### 1. Crear el repositorio
+## Modelo de entrenamiento
 
-1. Entra en https://github.com/new con tu cuenta.
-2. Elige un nombre técnico provisional, por ejemplo `trainer-peak`. No necesitas resolver la marca para publicar una prueba.
-3. Selecciona **Public** para usar Pages con GitHub Free. El código y el catálogo serán públicos; tus registros locales no están en estos archivos.
-4. Marca **Add a README file** y crea el repositorio. No añadas una licencia al código de la app sin decidir cuál quieres utilizar; el catálogo conserva su propia licencia.
+Las reglas predeterminadas son editables y organizan la planificación alrededor del volumen, el esfuerzo y la progresión:
 
-### 2. Subir el proyecto con GitHub Desktop
+| Parámetro | Valor predeterminado |
+| --- | --- |
+| Volumen semanal por músculo | 8–10 o 12–16 series computables, según la modalidad |
+| Cómputo de series | Directas: 1; indirectas relevantes: 0,5; calentamiento: 0 |
+| Repeticiones | Inicio en 6–10, con progresión hasta 12 |
+| Esfuerzo de trabajo | RPE 8–9; RPE 10 para sesiones de prueba |
+| Incremento de carga | Objetivo del 5%, ajustado al equipamiento, cuando todas las series prescritas alcanzan 12 repeticiones con RPE ≤ 9 |
+| Descarga | Reducción orientativa del 10% de carga, RPE 6–7 y mismo número de series |
+| Descansos | 180, 120 o 90 segundos según el ejercicio |
 
-1. Instala GitHub Desktop desde https://desktop.github.com/ e inicia sesión en tu cuenta.
-2. En GitHub Desktop: **File → Clone repository**, selecciona el repositorio que acabas de crear y una carpeta local.
-3. Descomprime el paquete entregado. Copia **el contenido** de `entreno-pages` dentro de la carpeta clonada, reemplazando su README inicial.
-4. Deben quedar `index.html`, `package.json` y `.github` directamente en la raíz del repositorio, no dentro de otra carpeta `entreno-pages`. Incluye `.github/workflows/pages.yml` y `.gitignore`; activa la visualización de archivos ocultos si no los ves.
-5. En GitHub Desktop, revisa los cambios, escribe «Preparar PWA» y pulsa **Commit to main**. Después pulsa **Push origin**.
+El generador propone rutinas que pueden revisarse y modificarse. Las reglas constituyen decisiones de producto apoyadas en literatura de entrenamiento; el programa completo no es un protocolo validado como conjunto. La evidencia y los criterios utilizados se documentan en [FUENTES.md](FUENTES.md).
 
-No copies tus respaldos JSON de entrenamientos dentro del repositorio. Los patrones de copia habituales están ignorados, pero conviene mantener todos los respaldos personales fuera de esta carpeta.
+## Almacenamiento y funcionamiento sin conexión
 
-### 3. Activar la publicación
+Los entrenamientos, las preferencias y las personalizaciones se almacenan en **IndexedDB**. El service worker conserva los archivos de la aplicación y el catálogo para utilizarlos sin conexión tras su descarga inicial.
 
-1. En la página del repositorio: **Settings → Pages**.
-2. En **Build and deployment → Source**, elige **GitHub Actions**. No uses «Deploy from a branch» para este paquete.
-3. Abre **Actions → Publicar PWA en GitHub Pages → Run workflow**, selecciona `main` y ejecuta. Esto también permite repetir la primera ejecución si falló porque Pages aún no estaba activado.
-4. Espera a que los trabajos `build` y `deploy` queden verdes. Si GitHub pide habilitar Actions en el repositorio, habilítalo.
-5. La dirección final aparecerá en el despliegue y en **Settings → Pages**. Normalmente tendrá la forma `https://josephdonoso.github.io/trainer-peak/`.
+No hay inicio de sesión, sincronización entre dispositivos ni envío del historial a GitHub. Cada instalación mantiene sus propios datos. Los respaldos JSON permiten transferirlos o recuperarlos; borrar el almacenamiento del navegador puede eliminarlos.
 
-El flujo ya incluye pruebas, preparación de archivos estáticos, carga del artefacto y despliegue. Usa el token automático limitado de GitHub; no tienes que crear tokens personales ni añadir secrets. Tampoco requiere ejecutar npm en tu ordenador para publicar.
-
-### 4. Instalar en Android
-
-1. Abre la URL publicada en Chrome con conexión a internet.
-2. En **Datos**, espera a que aparezca «Los archivos están preparados para abrir sin conexión».
-3. Pulsa **Instalar app** o usa el menú de Chrome → **Añadir a pantalla de inicio / Instalar app**.
-4. Abre una vez desde el nuevo icono mientras sigues conectado. Después activa modo avión y comprueba la apertura, el catálogo y el registro de una serie.
-5. Si usabas la versión local, exporta allí un JSON e impórtalo en la versión publicada. Cambiar de localhost a GitHub crea un almacenamiento distinto.
-
-Cada familiar instala la misma dirección y conserva su propia información. El sitio es público, pero los registros no se envían al repositorio ni se comparten entre teléfonos.
-
-## Actualizaciones
-
-- Modifica los archivos fuente de la raíz, confirma los cambios y haz Push a `main`. GitHub publicará automáticamente si las pruebas pasan.
-- La compilación calcula una versión de caché basada en el contenido: no es necesario cambiar manualmente un número de versión.
-- En la app, usa **Datos → Buscar actualizaciones** mientras tienes internet. Una vez descargada, cierra y vuelve a abrir la app; no se fuerza una recarga en medio de una sesión.
-- El caché de archivos se actualiza sin borrar IndexedDB. Exporta de todos modos copias periódicas.
-- Mantén estable el propietario, nombre del repositorio y dominio. Cambiar la dirección puede hacer que el navegador use otro almacenamiento. Exporta antes de migrar.
-- El almacenamiento y los cachés están separados por ruta del proyecto. Esto evita colisiones accidentales con otras instalaciones de esta app en el mismo dominio; no proporciona aislamiento de seguridad entre sitios del mismo origen. Usa una cuenta/dominio de confianza para alojar tus aplicaciones.
+Las actualizaciones de la aplicación se publican en GitHub Pages y utilizan una versión de caché calculada a partir del contenido. La actualización de archivos no borra la base de datos ni fuerza una recarga durante una sesión.
 
 ## Desarrollo local
 
-Necesitas Node.js 22 o posterior. No hay dependencias que instalar.
+Requiere **Node.js 22 o posterior**. No hay dependencias que instalar.
+
+```sh
+git clone https://github.com/JosephDonoso/trainer-peak.git
+cd trainer-peak
+npm start
+```
+
+El servidor local sirve la aplicación en `http://localhost:8765`.
+
+### Pruebas y compilación
 
 ```sh
 npm test
 npm run build
 node --test tests/pages.test.mjs
-npm start
 ```
 
-`npm start` abre el servidor de fuentes en localhost:8765; el artefacto publicado se genera en `dist/`. Para ver exactamente el build puedes servir `dist/` con un servidor estático. No abras index.html mediante file://.
+La compilación genera `dist/` con los archivos estáticos necesarios para publicar la PWA. Las pruebas cubren reglas de entrenamiento, validación de datos y comportamiento de publicación y caché bajo una subruta.
 
-## Estructura
+## Arquitectura
 
-- `app.js`, `core.js`, `storage.js`: interfaz, reglas y persistencia.
-- `catalog.json`: banco de ejercicios incluido.
-- `sw.js`, `manifest.webmanifest`: instalación y funcionamiento offline.
-- `scripts/build.mjs`: genera `dist/` con una lista explícita de archivos públicos.
-- `.github/workflows/pages.yml`: prueba y publica desde `main`.
-- `tests/`: pruebas de reglas y de publicación bajo una subruta.
-- `FUENTES.md`, `LICENSE-exercises.txt`: procedencia, evidencia y licencia del catálogo.
+Implementada con HTML, CSS y JavaScript mediante módulos ES, sin framework ni dependencias de ejecución.
 
-El programa de entrenamiento exacto es una decisión de producto fundamentada, no un protocolo validado como conjunto. Ver LEEME.md para funcionalidades y límites.
+| Archivo o directorio | Responsabilidad |
+| --- | --- |
+| `app.js` | Interfaz y flujos de la aplicación |
+| `core.js` | Generación de rutinas, progresión y cálculos |
+| `storage.js` | Persistencia local en IndexedDB |
+| `catalog.json` | Catálogo de ejercicios incorporado |
+| `sw.js` | Caché y funcionamiento sin conexión |
+| `manifest.webmanifest` | Metadatos de instalación de la PWA |
+| `scripts/build.mjs` | Preparación de archivos públicos y versión de caché |
+| `tests/` | Pruebas automatizadas |
+| `.github/workflows/pages.yml` | Integración y despliegue en GitHub Pages |
 
-## Qué está verificado y qué falta
+## Despliegue
 
-Verificado localmente: pruebas de las reglas, build, rutas de proyecto, archivos precargados, separación de cachés, respuestas offline simuladas y aislamiento del nombre de la base de datos. La versión anterior también se probó en navegador con el servidor apagado. No se ha creado un repositorio remoto ni ejecutado el workflow en tu cuenta; el despliegue real y la instalación física en Android siguen pendientes.
+GitHub Actions ejecuta las pruebas, genera el artefacto estático y lo publica en GitHub Pages con cada cambio en `main`. El flujo también admite ejecución manual. Los archivos utilizan rutas relativas para funcionar bajo `/trainer-peak/`.
 
-Referencias oficiales:
-- https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
-- https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
-- https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
+## Catálogo y licencia
+
+El catálogo procede de [Free Exercise DB](https://github.com/yuhonas/free-exercise-db) y se distribuye bajo **Unlicense**, incluida en [LICENSE-exercises.txt](LICENSE-exercises.txt). Se incorpora el contenido textual; no se incluyen imágenes remotas. Los movimientos prioritarios tienen nombres adaptados al español, mientras que las instrucciones originales permanecen en inglés.
+
+La licencia del catálogo no se extiende automáticamente al código de la aplicación, que todavía no tiene una licencia de distribución definida.
+
+## Limitaciones
+
+- El generador puede señalar déficits de cobertura cuando el equipamiento o la distribución elegida impiden alcanzar los objetivos.
+- Los avisos de descanso dependen de las restricciones del navegador y del sistema operativo cuando la aplicación está cerrada o la pantalla está bloqueada.
+- El 1RM estimado utiliza la fórmula de Epley para series de 1–10 repeticiones; no se calcula para ejercicios de peso corporal o asistidos.
+- El almacenamiento local depende del navegador. La exportación de respaldos es el mecanismo de conservación y transferencia de datos.
